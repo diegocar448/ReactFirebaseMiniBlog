@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { db } from "../firebase/config";
-import { collection, query, orderBy, onSnapshot, where, QuerySnapshot, doc } from 'firebase/firestore';
+//import { collection, query, orderBy, onSnapshot, where, QuerySnapshot, doc } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, where } from "firebase/firestore";
 
 export const useFetchDocuments = (docCollection, search = null, uid = null) => {
     const [documents, setDocuments] = useState(null);
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(null);
 
     //deal with memory leak //para evitar vazamentos de memoria
     const [cancelled, setCancelled] = useState(false);
@@ -22,14 +23,14 @@ export const useFetchDocuments = (docCollection, search = null, uid = null) => {
                 let q;
 
                 //busca
-
                 //dashboard
+
                 q = await query(collectionRef, orderBy("createdAt", "desc"));
 
                 //aqui no onSnapShot para mapear os dados, sempre que for alterado ele vai setar
-                await onSnapshot(q, (querySnapShot) => {
+                await onSnapshot(q, (querySnapshot) => {
                     setDocuments(
-                        querySnapShot.docs.map((doc) => ({
+                        querySnapshot.docs.map((doc) => ({
                             id: doc.id,
                             ...doc.data(),
                         }))
@@ -51,5 +52,5 @@ export const useFetchDocuments = (docCollection, search = null, uid = null) => {
     useEffect(() =>{
         return () => setCancelled(true);
     }, [])
-    return documents, loading, error;
+    return {documents, loading, error};
 };
