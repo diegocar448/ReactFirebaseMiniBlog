@@ -33,7 +33,7 @@ export const useInsertDocument = (docCollection) => {
         if (!cancelled) {
             dispatch(action);
         }
-    }
+    };
 
     const insertDocument = async(document) => {
         
