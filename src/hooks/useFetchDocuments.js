@@ -11,7 +11,7 @@ export const useFetchDocuments = (docCollection, search = null, uid = null) => {
     //deal with memory leak //para evitar vazamentos de memoria
     const [cancelled, setCancelled] = useState(false);
 
-    useEffect(() => {
+    useEffect( () => {
         async function loadData(){
             if (cancelled) return
                 
@@ -25,8 +25,25 @@ export const useFetchDocuments = (docCollection, search = null, uid = null) => {
                 //busca
                 //dashboard
 
-                q = await query(collectionRef, orderBy("createdAt", "desc"));
+                if (search) {
+                    
+                    q = await query(
+                        collectionRef,
+                        where("tagsArray", "array-contains", search),
+                        
+                        //orderBy("title", "desc"),
+                      );
+                    
+                      
+                      
+                    
+                }else{
+                    
+                    q = await query(collectionRef, orderBy("createdAt", "desc"));
+                }
 
+                
+                
                 //aqui no onSnapShot para mapear os dados, sempre que for alterado ele vai setar
                 await onSnapshot(q, (querySnapshot) => {
                     setDocuments(
@@ -36,21 +53,25 @@ export const useFetchDocuments = (docCollection, search = null, uid = null) => {
                         }))
                     );
                 });
-
+                
                 setLoading(false);
             } catch (error) {
+                
                 console.log(error);
                 setError(error.message);
                 setLoading(false);
             }            
         }
-
+        
         loadData();
+        
     }, [docCollection, search, uid, cancelled])
 
-
+    
     useEffect(() =>{
+        
         return () => setCancelled(true);
     }, [])
+    
     return {documents, loading, error};
 };
